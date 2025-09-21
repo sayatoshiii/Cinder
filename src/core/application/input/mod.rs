@@ -5,7 +5,7 @@ use winit::{
     platform::scancode::PhysicalKeyExtScancode,
 };
 
-use crate::core::application::input::types::KeyInput;
+use crate::core::application::input::types::{KeyInput, KeyInputButton};
 
 pub mod types;
 
@@ -13,9 +13,12 @@ static mut KEYS_DOWN: Option<HashMap<PhysicalKey, KeyEvent>> = None;
 
 #[allow(dead_code)]
 pub fn get_input(event: &KeyEvent) -> KeyInput {
-    let key: String = get_input_key(event);
+    let input = KeyInputButton {
+        key: get_input_key(event),
+        code: get_input_key_code(event),
+    };
     let pressed: bool = event.state.is_pressed();
-    let held_keys: Vec<String>;
+    let held_keys: Vec<KeyInputButton>;
 
     unsafe {
         #[allow(static_mut_refs)]
@@ -30,23 +33,22 @@ pub fn get_input(event: &KeyEvent) -> KeyInput {
         held_keys = keys
             .iter()
             .filter(|(k, _)| *k != &event.physical_key)
-            .map(|(_, e)| get_input_key(e))
+            .map(|(_, e)| KeyInputButton {
+                key: get_input_key(e),
+                code: get_input_key_code(e),
+            })
             .collect();
     }
 
     KeyInput {
-        key,
+        input,
         pressed,
         held_keys,
     }
 }
 
-pub fn get_input_key(event: &KeyEvent) -> String {
-    format!("{:?}", event.physical_key.to_scancode())
-}
-
 #[allow(dead_code)]
-pub fn get_input_key_pretty(event: &KeyEvent) -> String {
+pub fn get_input_key(event: &KeyEvent) -> String {
     use KeyCode::*;
     let key = format!("{:?}", event.physical_key.to_scancode());
 
@@ -81,4 +83,8 @@ pub fn get_input_key_pretty(event: &KeyEvent) -> String {
         _ => event.logical_key.to_text().unwrap_or(&key),
     }
     .to_string()
+}
+
+pub fn get_input_key_code(event: &KeyEvent) -> String {
+    format!("{:?}", event.physical_key.to_scancode())
 }
