@@ -1,3 +1,4 @@
+use std::fs::read;
 use std::num::NonZeroU32;
 use std::rc::Rc;
 
@@ -5,6 +6,7 @@ use winit::{
     event::{Event, KeyEvent, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     keyboard::{Key, NamedKey},
+    window::{Window, WindowAttributes},
 };
 
 use crate::core::application::gui::windows::{
@@ -15,6 +17,7 @@ use crate::core::application::gui::windows::{
 pub mod gui;
 
 pub struct CinderApplication {
+    pub options: CinderApplicationOptions,
     pub render: Option<
         Box<
             dyn Fn(
@@ -28,15 +31,51 @@ pub struct CinderApplication {
     >,
 }
 
+#[derive(Debug, Clone)]
+pub struct CinderApplicationOptions {
+    pub window: WindowAttributes,
+    pub icon: Option<String>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CinderWindowAttributes {
+    pub title: Option<String>,
+}
+
 impl CinderApplication {
+    #[allow(dead_code)]
+    pub fn setup_window_attributes(attributes: CinderWindowAttributes) -> WindowAttributes {
+        Window::default_attributes()
+            .with_title(attributes.title.unwrap_or("Cinder Application".to_string()))
+    }
+
     #[allow(dead_code)]
     pub fn create(self: Self) {
         let event_loop = EventLoop::new().unwrap();
-
         let context = softbuffer::Context::new(event_loop.owned_display_handle()).unwrap();
 
+        let attributes = self.options.window;
+        let icon = self.options.icon;
+
         let app = WinitAppBuilder::with_init(
-            |elwt| make_window(elwt, |w| w),
+            move |elwt| {
+                let window = make_window(elwt, |_| attributes.clone());
+
+                if let Some(icon) = &icon {
+                    let icon_buffer =
+                        read(icon).expect(&format!("Could not find file @ '{}'", icon));
+                    let icon_image = image::load_from_memory(&icon_buffer).unwrap().into_rgba8();
+
+                    let (width, height) = icon_image.dimensions();
+                    let icon_raw_rgba = icon_image.into_raw();
+
+                    window.set_window_icon(Some(
+                        winit::window::Icon::from_rgba(icon_raw_rgba, width, height).unwrap(),
+                    ));
+                };
+
+                window
+            },
             move |_elwt, window| softbuffer::Surface::new(&context, window.clone()).unwrap(),
         )
         .with_event_handler({

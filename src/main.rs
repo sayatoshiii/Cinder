@@ -1,9 +1,16 @@
-use cinder::core::application::CinderApplication;
+use cinder::core::application::{CinderApplication, CinderApplicationOptions};
+use winit::window::Window;
 
 mod core;
 
 fn main() {
+    let attributes = Window::default_attributes().with_title("test");
+
     let app = CinderApplication {
+        options: CinderApplicationOptions {
+            window: attributes,
+            icon: None,
+        },
         render: Some(Box::new(|window, surface| {
             let size = window.inner_size();
             let width = size.width;
