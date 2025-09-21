@@ -19,7 +19,6 @@ pub(crate) fn run_app(event_loop: EventLoop<()>, mut app: impl ApplicationHandle
 }
 
 /// Create a window from a set of window attributes.
-#[allow(dead_code)]
 pub(crate) fn make_window(
     elwt: &ActiveEventLoop,
     f: impl FnOnce(WindowAttributes) -> WindowAttributes,

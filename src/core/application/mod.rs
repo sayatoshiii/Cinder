@@ -45,13 +45,11 @@ pub struct CinderWindowAttributes {
 }
 
 impl CinderApplication {
-    #[allow(dead_code)]
     pub fn setup_window_attributes(attributes: CinderWindowAttributes) -> WindowAttributes {
         Window::default_attributes()
             .with_title(attributes.title.unwrap_or("Cinder Application".to_string()))
     }
 
-    #[allow(dead_code)]
     pub fn create(self: Self) {
         let event_loop = EventLoop::new().unwrap();
         let context = softbuffer::Context::new(event_loop.owned_display_handle()).unwrap();

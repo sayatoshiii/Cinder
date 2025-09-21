@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub struct Colour {
     pub r: u8,
@@ -7,12 +6,10 @@ pub struct Colour {
 }
 
 impl Colour {
-    #[allow(dead_code)]
     pub fn bitwise<T: From<u32>>(&self) -> T {
         T::from(self.b as u32 | (self.g as u32) << 8 | (self.r as u32) << 16)
     }
 
-    #[allow(dead_code)]
     pub fn from_hex(hex: impl Into<String>) -> Self {
         let mut hex = hex.into();
         hex.retain(|c| c != '#');

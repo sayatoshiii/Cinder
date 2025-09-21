@@ -11,7 +11,6 @@ pub mod types;
 
 static mut KEYS_DOWN: Option<HashMap<PhysicalKey, KeyEvent>> = None;
 
-#[allow(dead_code)]
 pub fn get_input(event: &KeyEvent) -> KeyInput {
     let input = KeyInputButton {
         key: get_input_key(event),
@@ -47,7 +46,6 @@ pub fn get_input(event: &KeyEvent) -> KeyInput {
     }
 }
 
-#[allow(dead_code)]
 pub fn get_input_key(event: &KeyEvent) -> String {
     use KeyCode::*;
     let key = format!("{:?}", event.physical_key.to_scancode());
