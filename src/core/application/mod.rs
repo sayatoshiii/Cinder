@@ -3,7 +3,7 @@ use std::num::NonZeroU32;
 use std::rc::Rc;
 
 use winit::{
-    event::{Event, KeyEvent, WindowEvent},
+    event::{DeviceId, Event, KeyEvent, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     keyboard::{Key, NamedKey},
     window::{Window, WindowAttributes},
@@ -29,6 +29,7 @@ pub struct CinderApplication {
             ),
         >,
     >,
+    pub input: Option<Box<dyn Fn(DeviceId, KeyEvent, bool)>>,
 }
 
 #[derive(Debug, Clone)]
@@ -56,6 +57,7 @@ impl CinderApplication {
 
         let attributes = self.options.window;
         let icon = self.options.icon;
+        let input = self.input;
 
         let app = WinitAppBuilder::with_init(
             move |elwt| {
@@ -110,6 +112,19 @@ impl CinderApplication {
 
                         if let Some(window_render) = &window_render {
                             window_render(window, surface)
+                        }
+                    }
+                    Event::WindowEvent {
+                        window_id,
+                        event:
+                            WindowEvent::KeyboardInput {
+                                device_id,
+                                event,
+                                is_synthetic,
+                            },
+                    } if window_id == window.id() => {
+                        if let Some(callback) = &input {
+                            callback(device_id, event, is_synthetic)
                         }
                     }
                     Event::WindowEvent {

@@ -24,6 +24,7 @@ fn main() {
             }
             buffer.present().unwrap();
         })),
+        input: None,
     };
 
     app.create();
