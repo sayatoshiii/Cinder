@@ -15,6 +15,7 @@ use crate::core::application::gui::windows::{
 };
 
 pub mod gui;
+pub mod input;
 
 pub struct CinderApplication {
     pub options: CinderApplicationOptions,
@@ -29,7 +30,7 @@ pub struct CinderApplication {
             ),
         >,
     >,
-    pub input: Option<Box<dyn Fn(DeviceId, KeyEvent, bool)>>,
+    pub input: Option<Box<dyn Fn(&mut Rc<winit::window::Window>, DeviceId, KeyEvent, bool)>>,
 }
 
 #[derive(Debug, Clone)]
@@ -124,7 +125,7 @@ impl CinderApplication {
                             },
                     } if window_id == window.id() => {
                         if let Some(callback) = &input {
-                            callback(device_id, event, is_synthetic)
+                            callback(window, device_id, event, is_synthetic)
                         }
                     }
                     Event::WindowEvent {
