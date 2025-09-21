@@ -1,4 +1,5 @@
 #[allow(dead_code)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub struct Colour {
     pub r: u8,
     pub g: u8,
